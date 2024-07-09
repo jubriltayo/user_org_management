@@ -9,7 +9,7 @@ from .serializers import OrganisationSerializer
 
 
 
-class OrganisationListView(APIView):
+class OrganisationListCreateView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -20,6 +20,24 @@ class OrganisationListView(APIView):
             'message': 'Organisations retrieved successfully',
             'data': {'organisations': serializer.data}
         }, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        serializer = OrganisationSerializer(data=request.data)
+        if serializer.is_valid():
+            organisation = serializer.save()
+            organisation.users.add(request.user)
+            return Response({
+                'status': 'success',
+                'message': 'Organisation created successfully',
+                'data': serializer.data
+            }, status=status.HTTP_201_CREATED)
+        return Response({
+            'status': 'Bad Request',
+            'message': 'Client error',
+            'statusCode': 400,
+            'errors': [{'field': key, 'message': value[0]} for key, value in serializer.errors.items()]
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
 
 
 class OrganisationDetailView(APIView):
@@ -39,27 +57,6 @@ class OrganisationDetailView(APIView):
             'message': 'Access denied',
             'statusCode': 403
         }, status=status.HTTP_403_FORBIDDEN)
-
-
-class OrganisationCreateView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request):
-        serializer = OrganisationSerializer(data=request.data)
-        if serializer.is_valid():
-            organisation = serializer.save()
-            organisation.users.add(request.user)
-            return Response({
-                'status': 'success',
-                'message': 'Organisation created successfully',
-                'data': serializer.data
-            }, status=status.HTTP_201_CREATED)
-        return Response({
-            'status': 'Bad Request',
-            'message': 'Client error',
-            'statusCode': 400,
-            'errors': [{'field': key, 'message': value[0]} for key, value in serializer.errors.items()]
-        }, status=status.HTTP_400_BAD_REQUEST)
 
 
 class AddUserToOrganisationView(APIView):
