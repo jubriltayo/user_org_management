@@ -32,9 +32,9 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
-    'userorgmanagement-87o3t3z1x-tayo-jubrils-projects.vercel.app',
-    'vercel.app',
-    'now.sh'
+    # 'userorgmanagement-87o3t3z1x-tayo-jubrils-projects.vercel.app',
+    '.vercel.app',
+    '.now.sh'
 ]
 
 
