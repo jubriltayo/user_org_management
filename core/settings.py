@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 import os
 from dotenv import load_dotenv
-import dj_database_url
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -32,7 +31,6 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
-    # 'userorgmanagement-87o3t3z1x-tayo-jubrils-projects.vercel.app',
     '.vercel.app',
     '.now.sh'
 ]
@@ -49,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # third party packages
+    'drf_yasg',
     'rest_framework',
     'rest_framework_simplejwt',
 
@@ -61,6 +60,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -69,6 +69,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'core.urls'
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
 
 TEMPLATES = [
     {
@@ -99,19 +101,17 @@ WSGI_APPLICATION = 'core.wsgi.application'
 #     }
 # }
 
-# postgresql://user_org_management_user:tAPRPx5G3g3vTOzhiOsm2fWirFphV4zr@dpg-cq65jdss1f4s73dt0beg-a.oregon-postgres.render.com/user_org_management
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'railway',
-        'USER': 'postgres',
-        'PASSWORD': 'vhYAaVGBTvduBOfjFaxlOzgbjFMEmOCV',
-        'HOST': 'viaduct.proxy.rlwy.net',
-        'PORT': '46315',
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT'),
     }
 }
 
-# DATABASE_URL = postgresql://user_org_management_user:tAPRPx5G3g3vTOzhiOsm2fWirFphV4zr@dpg-cq65jdss1f4s73dt0beg-a.oregon-postgres.render.com/user_org_management
 
 AUTH_USER_MODEL = "users.User"
 
@@ -153,6 +153,7 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
@@ -192,4 +193,17 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
     'SLIDING_TOKEN_LIFETIME': timedelta(days=1),
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=5),
+}
+
+SWAGGER_SETTINGS = {
+   'SECURITY_DEFINITIONS': {
+      'Basic': {
+            'type': 'basic'
+      },
+      'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
+      }
+   }
 }
